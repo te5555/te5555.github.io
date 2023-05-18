@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-Hans-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>BZOJ5006 [THUWC2017] 随机二分图 - 清芷的博客</title>
+        <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon_3f3okc0t0smnz.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32_lrgcr2u2dgnr.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16_1siqrekx8ykol.png">
+        <link rel="manifest" href="../site.webmanifest">
+        <link rel="stylesheet" href="../css/fifthave_3dfyc7189qcwg.css" />
+        <link rel="stylesheet" href="../css/syntax_lf612iqmmilx.css" />
+        <link rel="stylesheet" href="../css/banana_2lzbro8offw8.css" />
+        <link rel="stylesheet" href="../css/katex.min_1koofb1j5udh9.css" />
+        <script src="../js/jquery-3.6.1.min_1udo1bomfn0oe.js"></script>
+        <script src="../js/proof-collapse_rlvnn55bzvd0.js"></script>
+        <script src="../js/table-of-contents_35en0xznwr03i.js"></script>
+        
+        <!-- The loading of KaTeX is deferred to speed up page rendering -->
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+
+        <!-- To automatically render math in text elements, include the auto-render extension: -->
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // ? auto-render specific keys, e.g.:
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    // ? rendering keys, e.g.:
+                    throwOnError : false
+                });
+            });
+        </script>
+        
+    </head>
+    <body>
+        <header>
+            <div class="logo">
+                <a href="..">清芷的博客</a>
+            </div>
+            <nav>
+                <a href="..">首页</a>
+                <a href="../about.html">关于</a>
+                <a href="../contact.html">联系</a>
+                <a href="../friends.html">友链</a>
+                <a href="../archive.html">归档</a>
+            </nav>
+        </header>
+
+        <main role="main">
+            <h1>BZOJ5006 [THUWC2017] 随机二分图</h1>
+            <div class="info">
+    
+    2018 年 04 月 11 日发布.
+    
+</div>
+
+<h3 id="description">Description</h3>
+<p>有一个左右各 $n$ 个点的二分图。有 $m$ 组有概率出现的边，分为三种：</p>
+<ol type="1">
+<li>一组一条边，出现或不出现的概率各有 50%。</li>
+<li>一组两条边，同时出现或同时不出现的概率各有 50%。</li>
+<li>一组两条边，必定会恰好出现一条，概率各有 50%。</li>
+</ol>
+<p>组与组之间的概率是独立的。</p>
+<p>问完美匹配的期望个数 $E$ ，输出 $2^nE \pmod {10^9+7}$ （显然是整数）。</p>
+<!--more-->
+<h3 id="solution">Solution</h3>
+<p>期望是可加的。所以可以枚举每个完美匹配求出现的概率和。复杂度 $O(n*n!)$ ， 20pts 。</p>
+<p>为什么要枚举完美匹配呢？能不能状压 DP 求 $f_{S1,S2}$ 表示左右边各剩下 $S1, S2$ 时完美匹配个数呢？</p>
+<p>因为第 2, 3 种边不好统计。假设只有第 1 种边。$O(m\sum_{i=0}^n {n \choose i}^2)$ （由于好多状态其实访问不到所以复杂度其实是 O( 玄学 ) ），配合上面那个有 40pts 。</p>
+<p>考虑有第 2, 3 种边。如果我枚举的匹配中，不存在某两条边在同一组，那么它的概率肯定是 $2^{-n}$ 。</p>
+<p>那么我考虑暂时把第 2, 3 种边拆开成两条独立的边，看对答案有什么影响。</p>
+<p>如果某个匹配同时用到了第 2 种边某组中的两条（两条边的端点显然互不相同），那么应该有 $\frac12$ 的概率。但是如果我把它看成独立的两条边的话就是 $\frac14$ 的概率。所以我新建“一条边”连着这 4 个点，出现概率为 $\frac14$ 。这样一来这个匹配就会被算两遍，每遍都有 $\frac14$ ，一共就是 $\frac12$ 。</p>
+<p>同样的，如果某个匹配同时用到了某组第 3 种边的两条，那么它会多算 $\frac14$ 的概率。那么我新建“一条边”连接这 4 个点，出现概率为 $-\frac14$ 。（似乎很魔幻）这样就可以把多出来的那 $\frac 14$ 抵消掉了。</p>
+<p>然后状压 DP 就好了。</p>
+<p>状态开不下？开 map 啊！</p>
+<p>map 太慢？ <del>unordered\_map</del> 手写 hash 表啊！</p>
+<h3 id="code">Code</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;algorithm&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;cstdio&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;cstring&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;map&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> Hash<span class="op">{</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">int</span> Mod <span class="op">=</span> <span class="dv">29999999</span><span class="op">;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> key<span class="op">[</span>Mod<span class="op">],</span> val<span class="op">[</span>Mod<span class="op">];</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> lastt<span class="op">,</span> lasts<span class="op">;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> count<span class="op">(</span><span class="dt">int</span> t<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> s <span class="op">=</span> t <span class="op">%</span> Mod<span class="op">;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>key<span class="op">[</span>s<span class="op">]</span> <span class="op">!=</span> t <span class="op">&amp;&amp;</span> key<span class="op">[</span>s<span class="op">]</span> <span class="op">!=</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(++</span>s <span class="op">==</span> Mod<span class="op">)</span> s <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    lastt <span class="op">=</span> t<span class="op">;</span> lasts <span class="op">=</span> s<span class="op">;</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> key<span class="op">[</span>s<span class="op">]</span> <span class="op">==</span> t<span class="op">;</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> <span class="op">&amp;</span>query<span class="op">(</span><span class="dt">int</span> t<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> s <span class="op">=</span> t <span class="op">%</span> Mod<span class="op">;</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>t <span class="op">==</span> lastt<span class="op">)</span> s <span class="op">=</span> lasts<span class="op">;</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">while</span> <span class="op">(</span>key<span class="op">[</span>s<span class="op">]</span> <span class="op">!=</span> t <span class="op">&amp;&amp;</span> key<span class="op">[</span>s<span class="op">]</span> <span class="op">!=</span> <span class="dv">0</span><span class="op">)</span> <span class="cf">if</span> <span class="op">(++</span>s <span class="op">==</span> Mod<span class="op">)</span> s <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    key<span class="op">[</span>s<span class="op">]</span> <span class="op">=</span> t<span class="op">;</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> val<span class="op">[</span>s<span class="op">];</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="dt">long</span> <span class="dt">long</span> LL<span class="op">;</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> <span class="dt">int</span> N <span class="op">=</span> <span class="dv">15</span><span class="op">;</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> <span class="dt">int</span> mod <span class="op">=</span> <span class="dv">1000000007</span><span class="op">;</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> <span class="dt">int</span> M <span class="op">=</span> <span class="dv">500</span><span class="op">;</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> n<span class="op">,</span> m<span class="op">,</span> A<span class="op">[</span>M<span class="op">],</span> B<span class="op">[</span>M<span class="op">],</span> C<span class="op">[</span>M<span class="op">];</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> f<span class="op">(</span><span class="dt">int</span> S1<span class="op">,</span> <span class="dt">int</span> S2<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  <span class="co">// E[S1,S2] * 2^|S|</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>S1 <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>Hash<span class="op">::</span>count<span class="op">(</span>S1 <span class="op">&lt;&lt;</span> n <span class="op">|</span> S2<span class="op">))</span> <span class="cf">return</span> Hash<span class="op">::</span>query<span class="op">(</span>S1 <span class="op">&lt;&lt;</span> n <span class="op">|</span> S2<span class="op">);</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> <span class="op">&amp;</span>ans <span class="op">=</span> Hash<span class="op">::</span>query<span class="op">(</span>S1 <span class="op">&lt;&lt;</span> n <span class="op">|</span> S2<span class="op">)</span> <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> x <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> <span class="op">((</span>S1 <span class="op">&gt;&gt;</span> x <span class="op">&amp;</span> <span class="dv">1</span><span class="op">)</span> <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">++</span>x<span class="op">;</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> m<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">((</span>A<span class="op">[</span>i<span class="op">]</span> <span class="op">&amp;</span> S1<span class="op">)</span> <span class="op">==</span> A<span class="op">[</span>i<span class="op">]</span> <span class="op">&amp;&amp;</span> <span class="op">(</span>B<span class="op">[</span>i<span class="op">]</span> <span class="op">&amp;</span> S2<span class="op">)</span> <span class="op">==</span> B<span class="op">[</span>i<span class="op">]</span> <span class="op">&amp;&amp;</span> <span class="op">(</span>A<span class="op">[</span>i<span class="op">]</span> <span class="op">&gt;&gt;</span> x <span class="op">&amp;</span> <span class="dv">1</span><span class="op">)</span> <span class="op">==</span> <span class="dv">1</span><span class="op">)</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    ans <span class="op">=</span> <span class="op">(</span>ans <span class="op">+</span> f<span class="op">(</span>S1 <span class="op">&amp;</span> <span class="op">~</span>A<span class="op">[</span>i<span class="op">],</span> S2 <span class="op">&amp;</span> <span class="op">~</span>B<span class="op">[</span>i<span class="op">])</span> <span class="op">*</span> C<span class="op">[</span>i<span class="op">])</span> <span class="op">%</span> mod<span class="op">;</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> ans<span class="op">;</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> c<span class="op">;</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>  scanf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%d%d</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">&amp;</span>n<span class="op">,</span> <span class="op">&amp;</span>c<span class="op">);</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> <span class="op">(</span>c<span class="op">--)</span> <span class="op">{</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> t<span class="op">,</span> x<span class="op">,</span> y<span class="op">;</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    scanf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%d</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">&amp;</span>t<span class="op">);</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>t <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>      scanf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%d%d</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">&amp;</span>x<span class="op">,</span> <span class="op">&amp;</span>y<span class="op">);</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>      A<span class="op">[</span>m<span class="op">]</span> <span class="op">=</span> <span class="dv">1</span> <span class="op">&lt;&lt;</span> <span class="op">(</span>x <span class="op">-</span> <span class="dv">1</span><span class="op">),</span> B<span class="op">[</span>m<span class="op">]</span> <span class="op">=</span> <span class="dv">1</span> <span class="op">&lt;&lt;</span> <span class="op">(</span>y <span class="op">-</span> <span class="dv">1</span><span class="op">),</span> C<span class="op">[</span>m<span class="op">++]</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>      scanf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%d%d</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">&amp;</span>x<span class="op">,</span> <span class="op">&amp;</span>y<span class="op">);</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>      A<span class="op">[</span>m<span class="op">]</span> <span class="op">=</span> <span class="dv">1</span> <span class="op">&lt;&lt;</span> <span class="op">(</span>x <span class="op">-</span> <span class="dv">1</span><span class="op">),</span> B<span class="op">[</span>m<span class="op">]</span> <span class="op">=</span> <span class="dv">1</span> <span class="op">&lt;&lt;</span> <span class="op">(</span>y <span class="op">-</span> <span class="dv">1</span><span class="op">),</span> C<span class="op">[</span>m<span class="op">++]</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>      scanf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%d%d</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">&amp;</span>x<span class="op">,</span> <span class="op">&amp;</span>y<span class="op">);</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>      A<span class="op">[</span>m<span class="op">]</span> <span class="op">=</span> <span class="dv">1</span> <span class="op">&lt;&lt;</span> <span class="op">(</span>x <span class="op">-</span> <span class="dv">1</span><span class="op">),</span> B<span class="op">[</span>m<span class="op">]</span> <span class="op">=</span> <span class="dv">1</span> <span class="op">&lt;&lt;</span> <span class="op">(</span>y <span class="op">-</span> <span class="dv">1</span><span class="op">),</span> C<span class="op">[</span>m<span class="op">++]</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>A<span class="op">[</span>m <span class="op">-</span> <span class="dv">1</span><span class="op">]</span> <span class="op">!=</span> A<span class="op">[</span>m <span class="op">-</span> <span class="dv">2</span><span class="op">]</span> <span class="op">&amp;&amp;</span> B<span class="op">[</span>m <span class="op">-</span> <span class="dv">1</span><span class="op">]</span> <span class="op">!=</span> B<span class="op">[</span>m <span class="op">-</span> <span class="dv">2</span><span class="op">])</span> <span class="op">{</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>        A<span class="op">[</span>m<span class="op">]</span> <span class="op">=</span> A<span class="op">[</span>m <span class="op">-</span> <span class="dv">1</span><span class="op">]</span> <span class="op">|</span> A<span class="op">[</span>m <span class="op">-</span> <span class="dv">2</span><span class="op">],</span> B<span class="op">[</span>m<span class="op">]</span> <span class="op">=</span> B<span class="op">[</span>m <span class="op">-</span> <span class="dv">1</span><span class="op">]</span> <span class="op">|</span> B<span class="op">[</span>m <span class="op">-</span> <span class="dv">2</span><span class="op">];</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>        C<span class="op">[</span>m<span class="op">++]</span> <span class="op">=</span> <span class="op">(</span>t <span class="op">==</span> <span class="dv">1</span> <span class="op">?</span> <span class="dv">1</span> <span class="op">:</span> <span class="op">-</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>  printf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">(</span>f<span class="op">((</span><span class="dv">1</span> <span class="op">&lt;&lt;</span> n<span class="op">)</span> <span class="op">-</span> <span class="dv">1</span><span class="op">,</span> <span class="op">(</span><span class="dv">1</span> <span class="op">&lt;&lt;</span> n<span class="op">)</span> <span class="op">-</span> <span class="dv">1</span><span class="op">)</span> <span class="op">+</span> mod<span class="op">)</span> <span class="op">%</span> mod<span class="op">);</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+
+        </main>
+
+        <footer>
+            ♥ 由
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+            生成！
+
+            © 遵循
+            <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
+                CC-BY 4.0
+            </a>
+            知识共享协议.
+        </footer>
+    </body>
+</html>

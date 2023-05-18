@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-Hans-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>BZOJ2431 [HAOI2009] 逆序对数列 - 清芷的博客</title>
+        <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon_3f3okc0t0smnz.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32_lrgcr2u2dgnr.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16_1siqrekx8ykol.png">
+        <link rel="manifest" href="../site.webmanifest">
+        <link rel="stylesheet" href="../css/fifthave_3dfyc7189qcwg.css" />
+        <link rel="stylesheet" href="../css/syntax_lf612iqmmilx.css" />
+        <link rel="stylesheet" href="../css/banana_2lzbro8offw8.css" />
+        <link rel="stylesheet" href="../css/katex.min_1koofb1j5udh9.css" />
+        <script src="../js/jquery-3.6.1.min_1udo1bomfn0oe.js"></script>
+        <script src="../js/proof-collapse_rlvnn55bzvd0.js"></script>
+        <script src="../js/table-of-contents_35en0xznwr03i.js"></script>
+        
+        <!-- The loading of KaTeX is deferred to speed up page rendering -->
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+
+        <!-- To automatically render math in text elements, include the auto-render extension: -->
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // ? auto-render specific keys, e.g.:
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    // ? rendering keys, e.g.:
+                    throwOnError : false
+                });
+            });
+        </script>
+        
+    </head>
+    <body>
+        <header>
+            <div class="logo">
+                <a href="..">清芷的博客</a>
+            </div>
+            <nav>
+                <a href="..">首页</a>
+                <a href="../about.html">关于</a>
+                <a href="../contact.html">联系</a>
+                <a href="../friends.html">友链</a>
+                <a href="../archive.html">归档</a>
+            </nav>
+        </header>
+
+        <main role="main">
+            <h1>BZOJ2431 [HAOI2009] 逆序对数列</h1>
+            <div class="info">
+    
+    2018 年 03 月 14 日发布.
+    
+</div>
+
+<h3 id="description">Description</h3>
+<p>求$1$到$n$的排列中逆序对数为$k$的排列个数。$n,k\leqslant1000$。</p>
+<!--more-->
+<h3 id="solution">Solution</h3>
+<p>dp。考虑如果第一个数为$t$，那么会产生$t-1$个逆序对；剩下的相当于一个$n-1$的排列。所以
+$$
+f_{n,k}=\sum_{i=0}^{n-1}f_{n-1,k-i}
+$$
+代码中强行前缀和优化qwq。</p>
+<h3 id="code">Code</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;cstdio&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> <span class="dt">int</span> N <span class="op">=</span> <span class="dv">1050</span><span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> <span class="dt">int</span> mod <span class="op">=</span> <span class="dv">10000</span><span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> f<span class="op">[</span>N<span class="op">][</span>N<span class="op">];</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n<span class="op">,</span> k<span class="op">;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  scanf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%d%d</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">&amp;</span>n<span class="op">,</span> <span class="op">&amp;</span>k<span class="op">);</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  f<span class="op">[</span><span class="dv">0</span><span class="op">][</span><span class="dv">0</span><span class="op">]</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;=</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    f<span class="op">[</span>i<span class="op">][</span><span class="dv">0</span><span class="op">]</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> j <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> j <span class="op">&lt;=</span> k<span class="op">;</span> <span class="op">++</span>j<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>      f<span class="op">[</span>i<span class="op">][</span>j<span class="op">]</span> <span class="op">=</span> f<span class="op">[</span>i<span class="op">][</span>j <span class="op">-</span> <span class="dv">1</span><span class="op">]</span> <span class="op">+</span> f<span class="op">[</span>i <span class="op">-</span> <span class="dv">1</span><span class="op">][</span>j<span class="op">];</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>j <span class="op">&gt;=</span> i<span class="op">)</span> f<span class="op">[</span>i<span class="op">][</span>j<span class="op">]</span> <span class="op">-=</span> f<span class="op">[</span>i <span class="op">-</span> <span class="dv">1</span><span class="op">][</span>j <span class="op">-</span> i<span class="op">];</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>      f<span class="op">[</span>i<span class="op">][</span>j<span class="op">]</span> <span class="op">%=</span> mod<span class="op">;</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  printf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">(</span>f<span class="op">[</span>n<span class="op">][</span>k<span class="op">]</span> <span class="op">+</span> mod<span class="op">)</span> <span class="op">%</span> mod<span class="op">);</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+
+        </main>
+
+        <footer>
+            ♥ 由
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+            生成！
+
+            © 遵循
+            <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
+                CC-BY 4.0
+            </a>
+            知识共享协议.
+        </footer>
+    </body>
+</html>

@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-Hans-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>浅谈 OI 中常用的一些生成函数运算的合法与正确性 - 清芷的博客</title>
+        <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon_3f3okc0t0smnz.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32_lrgcr2u2dgnr.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16_1siqrekx8ykol.png">
+        <link rel="manifest" href="../site.webmanifest">
+        <link rel="stylesheet" href="../css/fifthave_3dfyc7189qcwg.css" />
+        <link rel="stylesheet" href="../css/syntax_lf612iqmmilx.css" />
+        <link rel="stylesheet" href="../css/banana_2lzbro8offw8.css" />
+        <link rel="stylesheet" href="../css/katex.min_1koofb1j5udh9.css" />
+        <script src="../js/jquery-3.6.1.min_1udo1bomfn0oe.js"></script>
+        <script src="../js/proof-collapse_rlvnn55bzvd0.js"></script>
+        <script src="../js/table-of-contents_35en0xznwr03i.js"></script>
+        
+        <!-- The loading of KaTeX is deferred to speed up page rendering -->
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+
+        <!-- To automatically render math in text elements, include the auto-render extension: -->
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // ? auto-render specific keys, e.g.:
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    // ? rendering keys, e.g.:
+                    throwOnError : false
+                });
+            });
+        </script>
+        
+    </head>
+    <body>
+        <header>
+            <div class="logo">
+                <a href="..">清芷的博客</a>
+            </div>
+            <nav>
+                <a href="..">首页</a>
+                <a href="../about.html">关于</a>
+                <a href="../contact.html">联系</a>
+                <a href="../friends.html">友链</a>
+                <a href="../archive.html">归档</a>
+            </nav>
+        </header>
+
+        <main role="main">
+            <h1>浅谈 OI 中常用的一些生成函数运算的合法与正确性</h1>
+            <div class="info">
+    
+    2019 年 05 月  9 日发布.
+    
+</div>
+
+<p>在 OI 中会用到很多生成函数运算...比如求逆（本文中均指乘法逆，而非复合逆）、$\exp$、$\ln$、牛顿迭代、微积分、拉格朗日反演等。</p>
+<p>那么就会有很多问题，比如：</p>
+<!--more-->
+<ol type="1">
+<li>求逆（指乘法逆），$\ln,\exp$ 等生成函数运算在什么时候有定义？</li>
+<li>这些运算为什么满足我们所期待的性质，如 $\ln\exp A=A,\exp(A+B)=\exp A\cdot\exp B$？</li>
+<li>如果你了解过一些（分析意义上的）级数，你可能还会疑惑为什么会存在 $\sum_n n!x^n$ 这种东西（因为它只在 $x=0$ 时收敛）...</li>
+</ol>
+<p>归根结底，我们所疑惑的关键在于：为什么可以对这些东西做这些运算？</p>
+<p>好的，现在让我们忘记所谓“函数”，而只用一个序列来定义幂级数。</p>
+<h2 id="定义及基础运算">1. 定义及基础运算</h2>
+<p>定义一个 <strong>形式幂级数</strong> （以下简称幂级数）为一个形如 $a_0+a_1x+a_2x^2+\dots$ 形式的表达式。 <em>（注意，这里只有形式：你不需要在意它具体表达什么。）</em>
+而序列 $\{a_n\}$ 称为其 <strong>系数序列</strong> 。称两个幂级数 <strong>相等</strong> 当且仅当它们的系数序列相同。</p>
+<p>为简便，记 $[x^n]f(x)$ 表示幂级数 $f$ 的 $n$ 次项系数。另外，也用 $f(0)$ 表示 $f$ 的 $0$ 次项系数。</p>
+<p>我们可以对其做一些运算，例如 <strong>加法</strong> 或 <strong>减法</strong>。其定义是</p>
+<p>$$ \sum_n a_n x^n \pm \sum_n b_n x^n = \sum_n (a_n \pm b_n) x^n $$</p>
+<p>幂级数的乘法由卷积来定义，即</p>
+<p>$$ \left(\sum_n a_n x^n \right) \left(\sum_n b_n x^n \right) = \sum_n c_n x^n\quad(c_n = \sum_k a_k b_{n-k}) $$</p>
+<p>现在你可以验证其满足各种我们所熟知的规律，比如加法交换律、加法结合律、乘法交换/结合律、乘法分配律等等（因此它们构成了一个环）。这些都很简单<del>留作习题</del>。</p>
+<p>等下，说好的四则运算呢？还差一个除法...显然要定义除法，只需要定义逆元即 $f^{-1}$。但是有些幂级数是不可能有逆元的，比如首项系数为 $0$ 的幂级数。事实上这也是充要条件，即</p>
+<h3 id="命题-1">命题 1</h3>
+<blockquote>
+<p>幂级数 $f(x) = \sum_n a_n x^n$ 存在逆元当且仅当 $a_0 \neq 0$。</p>
+</blockquote>
+<p><em>证明</em>：必要性很简单，因为若 $a_0 = 0$ 那么 $f$ 与任何幂级数的乘积的零次项系数都是 $0$。</p>
+<p>设 $f^{-1} = \sum_n b_n x^n$，那么 $f \cdot f^{-1} = 1$ 相当于说 $\sum_k a_k b_{n-k} = [n=0]$，于是只需要</p>
+<p>$$ b_n = \frac{1}{a_0}\left( [n=0] - \sum_{k&gt;0} a_k b_{n-k} \right) $$</p>
+<p>即可。$\square$</p>
+<h2 id="级数及收敛">2. 级数及收敛</h2>
+<p>有的时候我们会遇到幂级数的无穷求和或者无穷乘积，即</p>
+<p>$$ \sum_{n=0}^{\infty} f_n(x) \\ \prod_{n=0}^{\infty} g_n(x) $$</p>
+<p>这些东西如何定义？什么时候结果是存在的？</p>
+<p>考虑无穷求和。令 $S_n(x)$ 表示部分和（即 $\sum_{i=0}^n f_i(x)$），如果随着 $n$ 的增大，$S_n(x)$ 能“收敛”到某个函数 $S(x)$，那么就可以认为无穷和式收敛到 $S(x)$。对于“收敛”，可以这样考虑：如果要计算 $S(x)$ 的前 $k$ 项，而当 $n$ 超过某个 $N$ 的时候 $S_n$ 的前 $k$ 项就固定了下来，那么就可以认为 $S$ 的前 $k$ 项等于 $S_N$ 的前 $k$ 项。如果对于任意大的 $k$ 都存在这样的一个 $N$ ，就可以认为 $S_n$ 是收敛的，把这样计算出来的 $S$ 称作 $\{S_n\}$ 这列幂级数的极限。</p>
+<p>形式化的，对于幂级数 $f(x) = \sum_n a_n x^n$，定义 ${\rm ord}(f)$ 表示 $f$ 的最低非 $0$ 项的次数，即 ${\rm ord}(f)=\min\{ i \mid a_i \neq 0\}$；幂级数列 $\{S_n\}$ <strong>收敛</strong> 到 $S$ 的定义就是</p>
+<p>$$ \forall k, \exists N, \text{s.t. } \forall n&gt;N, {\rm ord}(S-S_n) &gt; k $$</p>
+<p>或者</p>
+<p>$$ \lim_{n\to\infty} {\rm ord}(S-S_n)=\infty $$</p>
+<p>而若给出函数列 $S_n$，它若收敛，则只需要随着 $n$ 的增大，它开头的项固定下来的越来越多，即</p>
+<p>$$ \forall k, \exists N, \text{s.t. } \forall n, m&gt;N, {\rm ord}(S_m-S_n) &gt; k $$</p>
+<p>可以发现这实际上就是柯西收敛。而且在此可以更一步发现只需要 ${\rm ord}(S_{n+1}-S_n)\to\infty$ 即可，于是在 $S_n = \sum_{i=0}^n f_i$ 的时候无穷和式收敛的充要条件就是</p>
+<p>$$ \lim_{n\to\infty} {\rm ord}(f_n) = \infty $$</p>
+<p>当无穷和式收敛的时候，我们实际上可以任意交换其求和顺序（任意交换求和顺序是指将无穷项进行重排，但是并不能展开和式中的括号。最简单的例子比如 $(x-x)+(x-x)+\dots=0+0+0+\dots=0$，但是将括号展开就不收敛了）。因为上式等价于对任意的 $k$，${\rm ord}(f_n)&lt;k$ 的项只有有限个，无论如何交换其求和顺序都是不变的。（下面的无穷乘积也是如此）。</p>
+<p>对于无穷乘积亦是如此。在大多数情况下只需要考虑 $g_n(0) = 1$ 的情况，此时若令 $S_n(x)$ 表示 $g_n(x)$ 的前缀积，则</p>
+<p>$$ S_{n+1} - S_n = S_n\cdot(g_{n+1}-1) $$</p>
+<p>由于 $ {\rm ord}(f\dot g)={\rm ord}(f)+{\rm ord}(g) $，于是 ${\rm ord}(S_n)=\sum_{i=0}^n{\rm ord}(g_n)=0$，从而</p>
+<p>$$ {\rm ord}(S_{n+1} - S_n) = {\rm ord}(g_{n+1}-1) $$</p>
+<p>这样的话，无穷乘积的极限存在的充要条件就是</p>
+<p>$$ \lim_{n\to\infty} {\rm ord}(g_n-1) = \infty $$</p>
+<p>关于幂级数列的收敛，还有一个定义就是运算的 <strong>连续性</strong>。如果一个一元运算 $T$满足对任意的收敛数列 $\{f_n\} \to F$，都有 $\lim_{n\to\infty}T(f_n)=T(f)$，那么称 $T$ 是连续的。类似的，如果有一个二元运算 $T(f,g)$，当任意固定 $f$ 时其对 $g$ 是连续的、任意固定 $g$ 时其对 $f$ 是连续的，那么就称它是连续的。</p>
+<p>幂级数的四则运算（在有定义时）都是连续的；特别的，我们有</p>
+<p>$$ \begin{aligned}
+{\rm ord}(f \pm g) &amp;\geq \min({\rm ord}(f), {\rm ord}(g)) \\
+{\rm ord}(fg) &amp;= {\rm ord}(f) + {\rm ord}(g) \\
+{\rm ord}(1/f-1/g) &amp;= {\rm ord}(f-g)
+\end{aligned} $$</p>
+<h2 id="幂级数的复合">3. 幂级数的复合</h2>
+<p>对于幂级数的 <strong>复合</strong> $f(g(x))$，可以直接定义</p>
+<p>$$ (f \circ g)(x) = f(g(x)) = \sum_n a_n g^n(x) $$</p>
+<p>其中 $\{a_n\}$ 是 $f$ 的系数序列。可以发现，上式有定义（即收敛）当且仅当 $f$ 是有限的（多项式）或者 $g(0)=0$。</p>
+<p>一个幂级数 $g(x)$ 的 <strong>复合逆</strong> 定义为另一个幂级数 $g^{&lt;-1&gt;}(x)$，使得</p>
+<p>$$g^{&lt;-1&gt;}(g(x)) = g(g^{&lt;-1&gt;}(x)) = x$$</p>
+<p>如果展开幂级数复合的式子，可以得到这么一个东西：</p>
+<p>$$ (f \circ g)(x) = \sum_n x^n \sum_k f_k \sum_{a_1+a_2+\dots+a_k=n} g_{a_1} g_{a_2} \cdots g_{a_k} $$</p>
+<p>...不过这大概不会有什么用处。</p>
+<p>通过这个式子可以验证复合的结合律（注意，生成函数不是真正的“函数”，所谓“复合”只是我们所定义的一个运算，所以不能认为其直接和函数一样具有结合律），但是很麻烦。相对的，有一个简洁得多的证法。</p>
+<h3 id="命题-2">命题 2</h3>
+<blockquote>
+<p>幂级数的复合存在结合律，即 $(f \circ g) \circ h = f \circ (g \circ h)$。</p>
+</blockquote>
+<p>首先我们需要几个容易验证的命题，比如：</p>
+<p>$$ \begin{aligned}
+((f \pm g) \circ h) &amp;= (f \circ h) \pm (g \circ h)\\
+((f \cdot g) \circ h) &amp;= (f \circ h) \cdot (g \circ h)\\
+(f^n \circ g) &amp;= (f \circ g)^n\\
+{\rm ord}(f \circ g) &amp;= {\rm ord}(f) \cdot {\rm ord}(g)\\
+\lim_{n\to\infty} (f_n \circ g) &amp;= (\lim_{n\to\infty} f_n) \circ g
+\end{aligned} $$</p>
+<p>其中后两个式子假定 $g(0)=0$，前三个式子只要求函数复合有定义即可（即，$f$ 为多项式或 $g(0)=0$）；前两式都是可以直接验证的，而第三式可以由第二式得来；对于第五个式子，设 $f_n$ 的极限为 $F$，那么随着 $n$ 的增大，${\rm ord}(F(g(x)) - f_n(g(x))) = {\rm ord}((F - f_n) \circ g) = {\rm ord}(F - f_n) \cdot {\rm ord}(g)$ 也会趋近于无穷，因此也是显然可见的（第五个式子说明幂级数复合对 $f$ 是连续的；并且事实上其对 $g$ 也是如此）。</p>
+<p>接下来，考虑固定 $g,h$，对任意的 $f$ 求证 $(f \circ g) \circ h = f \circ (g \circ h)$。</p>
+<p>首先对 $f(x) = c$ （常数）或者 $f(x) = x$，答案都是显然的；其次，根据上面的前两个式子，可以发现当 $f_1,f_2$ 满足条件时 $f_1 \pm f_2$ 和 $f_1 \cdot f_2$ 也满足条件，因此对于所有可以用常数以及 $x$ 通过有限次加减乘运算得到的 $f$，即任意的多项式，都是满足条件的。</p>
+<p>之后对于任意幂级数 $f(x)$，定义 $f_n(x)$ 为它的前 $n$ 项的截断。显然有 $f(x) = \lim_{n\to\infty} f_n(x)$，而无论是 $(f \circ g) \circ h$ 还是 $f \circ (g \circ h)$ 都会保持极限不变，因此既然每个 $f_n$ 都满足两者相等的条件（因为 $f_n$ 是多项式），那么 $f$ 也满足条件。</p>
+<p>这样的话，就足以证明函数复合的结合律。$\square$</p>
+<h2 id="导数与积分">4. 导数与积分</h2>
+<p>导数和积分就可以直接仿照分析上的函数来定义，即若 $f(x) = \sum_n a_n x^n$，则</p>
+<p>$$ \begin{aligned}
+\frac{\mathrm d f(x)}{\mathrm dx} = f'(x) &amp;= \sum_n (n+1)a_{n+1}x^n \\
+\int f(x) \mathrm dx &amp;= \sum_{n&gt;0} \frac{a_{n-1}}{n} x^n
+\end{aligned} $$</p>
+<p>类似于分析上的函数，同样可以验证微分和积分是逆运算，即</p>
+<p>$$ \begin{aligned}
+\int f'(x) \mathrm dx &amp;= f(x) + C \\
+\frac{\mathrm d}{\mathrm dx} \int f(x) \mathrm dx &amp;= f(x)
+\end{aligned} $$</p>
+<p>第一行最后 $+C$ 是因为求导再积分就会把常数项的信息丢失。</p>
+<p>并且仍然可以得到求导的各种法则、以及积分的各种法则、和常见函数的微积分。由于公式很多，这里不赘述，但是拿出几个比较复杂的公式。</p>
+<p>首先是幂级数复合的求导，即 $\frac{\mathrm d}{\mathrm dx} f(g(x)) = f'(g(x))g'(x)$。对此可以沿用之前证明幂级数复合结合律的方式，通过 $f(x)=c; f(x)=x$ 出发用加减乘以及极限运算证明 $f$ 为任意幂级数的情形。</p>
+<p>之后是反函数，即复合逆的求导法则，即 $\frac{\mathrm d}{\mathrm dx} g^{&lt;-1&gt;}(x) = \frac1{g'(g^{&lt;-1&gt;}(x))}$。对此可以考虑</p>
+<p>$$ 1 = \frac{\mathrm d}{\mathrm dx} x = \frac{\mathrm d}{\mathrm dx} g(g^{&lt;-1&gt;}x) = g'(g^{&lt;-1&gt;}(x))g^{&lt;-1&gt;\prime}(x) $$</p>
+<p>即证毕。</p>
+<p>其次是积分换元法则，可以写作</p>
+<p>$$ \int f(x) \mathrm dx = (\int f(g(x))g'(x) \mathrm dx) \circ g^{&lt;-1&gt;} $$</p>
+<p>这个式子可能与原本的式子不一样，但是本质是相同的：等式右侧积分里面的 $x$ 就是换出的新变量 $t\,(x = g(t))$，对其积分得到 $F(t)$ 之后要把 $t$ 用 $x$ 表示出来，从而 $t = g^{&lt;-1&gt;}(x)$，于是原积分即为 $F(g^{&lt;-1&gt;}(x)) = F \circ g^{&lt;-1&gt;}$。</p>
+<p>这个法则可以通过两边求导得到，因为两边求导后都是 $f(x)$。至于常数项实际不需要考虑，因为积分出的常数项本来就不固定（可以想象两边都有一个常数 $C$）。</p>
+<p>实际上，由于幂级数和通常的实数域上的函数的运算法则几乎完全相同，甚至可以利用同样的方式求解微分方程。</p>
+<h2 id="指对函数">5. 指对函数</h2>
+<p>对于 $\ln,\exp$，我们会对其是否满足我们需要的性质感兴趣。</p>
+<p>首先我们验证一些关于 $\exp$ 的恒等式，关键点在于这个最基础的东西。</p>
+<h3 id="命题-3">命题 3</h3>
+<blockquote>
+<p>$ \exp(A+B)=\exp(A)\exp(B) $</p>
+</blockquote>
+<p>对此，写出 $\exp$ 的幂级数形式，即</p>
+<p>$$ \exp(x) = \sum_n \frac{x^n}{n!} $$</p>
+<p>将 $A+B$ 代入并把 $(A+B)^n$ 用二项式定理展开，换一换求和顺序就可以得到要证的式子。$\square$</p>
+<p>利用这个可以证明 $\exp(nA)=\exp^n(A)$ 之类的关于指数函数的简单性质。</p>
+<p>之后来证明 $\exp$ 和 $\ln$ 是否为逆运算。准确的说，由于 $\ln$ 不是幂级数（$\ln(1+x)$ 才是），我们会关心 $f(x)=\ln(1+x), g(x)=\exp(x)-1$ 是不是复合逆。因为如果它们是复合逆，那么定义 $\ln(A(x)) = \ln(1+ (A(x)-1)) = f(A(x)-1)$ 之后容易证明 $\ln\exp A = A; \exp\ln A = A$（只需要利用幂级数复合的结合性即可）。</p>
+<h3 id="命题-4">命题 4</h3>
+<blockquote>
+<p>$\ln(1+(\exp x-1))=x$</p>
+</blockquote>
+<p>对此可以对左右两边求导，左边由于 $\ln'(1+x) = \frac1{1+x}$ 可以直接验证，于是其导数为 $\frac1{1+(\exp x - 1)}\exp'(x)=1$，而右边的导数亦为 $1$；并且常数项都为 $0$，于是证毕。$\square$</p>
+<p>对于反过来的 $\exp(\ln(1+x)) = 1+x$ 也可以类似证明，不过有一个比较通用的方法：考虑若 $f(g(x)) = x$，如何证明 $g(f(x)) = x$？</p>
+<p>其实不难证明：根据 $f(g(x)) = x$ 即幂级数复合结合律，我们有 $g(f(g(x))) = g(x)$。从而若令 $h(x) = g(f(x)) - x$，那么 $h(g(x)) = 0$。但是若 $h(x)\neq0$，则容易证明 $h(g(x)) \neq 0$（注意到 $g(x)$ 不可能为 $0$）。于是 $h(x)=0$，即 $g(f(x)) = x$。</p>
+<p>这个结论告诉我们一个幂级数的“左复合逆”同时也是它的“右复合逆”。</p>
+<p>那么 $\ln$ 的一些性质就可以用 $\exp$ 的性质来倒推，在此不再赘述。</p>
+
+        </main>
+
+        <footer>
+            ♥ 由
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+            生成！
+
+            © 遵循
+            <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
+                CC-BY 4.0
+            </a>
+            知识共享协议.
+        </footer>
+    </body>
+</html>

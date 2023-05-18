@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-Hans-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>CSP2019 Solutions - 清芷的博客</title>
+        <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon_3f3okc0t0smnz.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32_lrgcr2u2dgnr.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16_1siqrekx8ykol.png">
+        <link rel="manifest" href="../site.webmanifest">
+        <link rel="stylesheet" href="../css/fifthave_3dfyc7189qcwg.css" />
+        <link rel="stylesheet" href="../css/syntax_lf612iqmmilx.css" />
+        <link rel="stylesheet" href="../css/banana_2lzbro8offw8.css" />
+        <link rel="stylesheet" href="../css/katex.min_1koofb1j5udh9.css" />
+        <script src="../js/jquery-3.6.1.min_1udo1bomfn0oe.js"></script>
+        <script src="../js/proof-collapse_rlvnn55bzvd0.js"></script>
+        <script src="../js/table-of-contents_35en0xznwr03i.js"></script>
+        
+        <!-- The loading of KaTeX is deferred to speed up page rendering -->
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+
+        <!-- To automatically render math in text elements, include the auto-render extension: -->
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // ? auto-render specific keys, e.g.:
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    // ? rendering keys, e.g.:
+                    throwOnError : false
+                });
+            });
+        </script>
+        
+    </head>
+    <body>
+        <header>
+            <div class="logo">
+                <a href="..">清芷的博客</a>
+            </div>
+            <nav>
+                <a href="..">首页</a>
+                <a href="../about.html">关于</a>
+                <a href="../contact.html">联系</a>
+                <a href="../friends.html">友链</a>
+                <a href="../archive.html">归档</a>
+            </nav>
+        </header>
+
+        <main role="main">
+            <h1>CSP2019 Solutions</h1>
+            <div class="info">
+    
+    2019 年 11 月 17 日发布.
+    
+</div>
+
+<h2 id="csp2019-题解">CSP2019 题解</h2>
+<p>代码早晚会有的。</p>
+<!--more-->
+<h3 id="d1t1-格雷码">D1T1 格雷码</h3>
+<h4 id="description">Description</h4>
+<p>给定 $n,k$，求 $n$ 位二进制格雷码中第 $k$ 个是多少。$n\leqslant64,0\leqslant k&lt;2^n$。</p>
+<h4 id="solution">Solution</h4>
+<p>可以递归求，也可以找规律得到答案为 <code>k ^ (k &gt;&gt; 1)</code>。</p>
+<p>注意 $k$ 需要用 <code>unsigned long long</code> 存储。</p>
+<h3 id="d1t2-括号树">D1T2 括号树</h3>
+<h4 id="descrption">Descrption</h4>
+<p>给出一棵有根树，每个结点上有一个括号。对每个点询问从根到它的括号字符串有多少个子串是合法括号串。</p>
+<p>$n\leqslant10^5$</p>
+<h4 id="solution-1">Solution</h4>
+<p>考虑计算根到每个点的字符串有多少个后缀是合法字符串，之后只需要求一个树上前缀和。</p>
+<p>定义一个点的深度 $d_x$ 为：从根到它的路径上左括号比右括号多多少个。</p>
+<p>那么令 $f_{x,i}$ 表示从根到 $x$ 的路径上有多少个点 $y$ 满足：</p>
+<ol type="1">
+<li>$y\dots x$ 这一段路径上的括号串任意前缀的左括号个数都大于等于右括号个数。也就是说，这个串可以通过在右边添加一些右括号得到合法括号串；</li>
+<li>$y$ 的深度等于 $i$。</li>
+</ol>
+<p>容易发现如果 $x$ 上面为右括号，$y\dots x$ 满足上述条件 1 且 $d_y=d_x+1$，则 $y\dots x$ 是合法括号串。所以 $x$ 的答案就是 $f_{x,d_x+1}$。</p>
+<p>可以发现当 $x$ 上面为左括号的时候</p>
+<p>$$
+f_{x,i}=\begin{cases}f_{fa_x,i}&amp;i\neq d_x\\f_{fa_x,i}+1&amp;i=d_x\end{cases}
+$$</p>
+<p>$x$ 上面为右括号的时候</p>
+<p>$$
+f_{x,i}=\begin{cases}f_{fa_x,i}&amp;i\neq d_x\\0&amp;i=d_x\end{cases}
+$$</p>
+<p>无论如何 $f_{x}$ 和 $f_{fa_x}$ 都只有一个位置不同，因此可以直接边 dfs 边修改 $f$（回溯的时候改回去就可以了）。复杂度$O(n)$。</p>
+<h3 id="d1t3-树上的数">D1T3 树上的数</h3>
+<p>待填。</p>
+<h3 id="d2t1-emiya-家今天的饭">D2T1 Emiya 家今天的饭</h3>
+<h4 id="desciption">Desciption</h4>
+<p>$n$ 种烹饪方式 $m$ 种食材，第 $i$ 种方式第 $j$ 种食材有 $a_{i,j}$ 种做法，要求做若干道（至少一道）菜使得每道菜的烹饪方式不同，且每种食材的菜不能超过一半（向下取整）。求共有多少种方式，对 998244353 取模。</p>
+<p>$n\leqslant100,m\leqslant2000,a_i&lt;998244353$。</p>
+<h4 id="solution-2">Solution</h4>
+<p>不考虑每种食材不超过一半的限制，答案是
+$$
+\prod_{i}\left(1+\sum_ja_{i,j}\right)-1
+$$
+减去 1 是去掉一道菜都不做的方案。</p>
+<p>显然只可能有一种菜超过一半，于是枚举这种菜，对每个方式做背包即可（记一维状态表示这种菜比别的菜多做了多少份）。</p>
+<p>背包复杂度 $O(n^2)$，总复杂度 $O(n^2m)$。<del>分治 FFT！</del></p>
+<h3 id="d2t2-划分">D2T2 划分</h3>
+<h4 id="description-1">Description</h4>
+<p>给定一个长为 $n$ 的正整数序列，要求把它划分成若干段分别求和后单调不降，最小化每一段的和的平方和。</p>
+<p>$n\leqslant4\times10^7$。</p>
+<h4 id="solution-3">Solution</h4>
+<p>结论：最优解同时一定也是所有合法解中最后一段的和最小的解。</p>
+<p>这个结论我还不会证...虽然它看上去很正确...</p>
+<p>有了这个结论之后可以令 $S_i$ 表示 $a_1+\dots+a_i$，$f_i$ 表示只靠虑 $1\dots i$ 的时候最后一段最小可以是多少。那么
+$$
+f_i=\min\{S_i-S_j\mid S_i-S_j\geq f_j\}
+$$
+显然会选择最大的合法的 $j$，并且条件相当于 $S_j+f_j\leqslant S_i$。单调队列即可。</p>
+<p>不能直接记录答案，要 DP 之后沿着转移从 $n$ 走回去求平方和（因为要高精度）。</p>
+<p>复杂度 $O(n)$。</p>
+<h3 id="d2t3-树的重心">D2T3 树的重心</h3>
+<h4 id="description-2">Description</h4>
+<p>给出一棵树，分割掉每条边之后在两边求重心，最后求所有重心的编号之和。如果有两个重心就都加上去。</p>
+<p>（重心定义为以其为根、每个子树大小都不超过总大小的一半（下取整））</p>
+<p>$n\leqslant3\times10^5$。</p>
+<h4 id="solution-4">Solution</h4>
+<p>显然任意情况下两个重心一定是相邻的，我们先求出其中较靠下的那个重心，最后 check 一下其父亲是不是也是重心就可以了。</p>
+<p>首先说明一个结论：任意一个树，以任意点为根，重心（所有重心）一定在根所在的重链上。证明省略，挺简单的。</p>
+<p>我们选择一个重心作为树根。</p>
+<p>接下来考虑每个点的子树的重心。令 $f_i$ 表示 $i$ 的字数的重心，$w_i$ 表示 $i$ 的重儿子。可以发现 $f_i$ 一定是 $f_{w_i}$ 的祖先，暴力跳就可以了（每条重链上都只会从下往上跳，所以总复杂度是 $O(n)$）。</p>
+<p>复杂的是求每个点字数外的重心。下面用 $r$ 表示树根（也是全树的重心）。</p>
+<p>如果某个点 $x$ 不在 $w_r$ 的子树里，那么删掉 $x$ 的子树之后 $r$ 的重儿子一定还是 $w_r$，从而重心还在原来那条重链上。把这条重链从上到下排列下来记作 $p_1(=r),p_2(=w_r),\dots,p_k$，那么删掉 $x$ 的子树后，重心就是最靠下的点 $p_i$ 使得 $siz_{p_i}\geq\lceil\frac{n-siz_x}{2}\rceil$。可以直接预处理出对每个 $t$，最靠下的 $siz_{p_i}\geq t$ 的点是哪个，然后 $O(1)$ 查询。</p>
+<p>还剩下 $w_r$ 的子树里的那些点。记 $v_r$ 表示 $r$ 的次大的儿子，我们“假装”把根节点的重链转而连到 $v_r$ 上；如果 $x$ 是 $w_r$ 的子树里的点，那么有两种可能：</p>
+<ol type="1">
+<li>删掉 $x$ 及其子树之后根节点的重儿子没变。但是这样的话既然本来重心就是 $r$，删掉 $x$ 的子树显然不会使得重心反而往 $x$ 的方向靠近。因此这时候重心还会是 $r$；</li>
+<li>删掉 $x$ 的子树后根节点的重儿子变了，那显然会变成 $v_r$。于是重心会在 $r$，或者 $v_r$ 的重链上。</li>
+</ol>
+<p>总之我们可以假装把 $r$ 的重儿子改成 $v_r$，然后对重儿子子树里所有的点做一个像之前求不在 $w_r$ 子树里的点的答案一样的做法。</p>
+<p>所有处理都是线性的，总复杂度也仅仅是 $O(n)$。</p>
+
+        </main>
+
+        <footer>
+            ♥ 由
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+            生成！
+
+            © 遵循
+            <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
+                CC-BY 4.0
+            </a>
+            知识共享协议.
+        </footer>
+    </body>
+</html>

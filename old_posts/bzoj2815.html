@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-Hans-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>BZOJ2815 [ZJOI2012] 灾难 - 清芷的博客</title>
+        <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon_3f3okc0t0smnz.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32_lrgcr2u2dgnr.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16_1siqrekx8ykol.png">
+        <link rel="manifest" href="../site.webmanifest">
+        <link rel="stylesheet" href="../css/fifthave_3dfyc7189qcwg.css" />
+        <link rel="stylesheet" href="../css/syntax_lf612iqmmilx.css" />
+        <link rel="stylesheet" href="../css/banana_2lzbro8offw8.css" />
+        <link rel="stylesheet" href="../css/katex.min_1koofb1j5udh9.css" />
+        <script src="../js/jquery-3.6.1.min_1udo1bomfn0oe.js"></script>
+        <script src="../js/proof-collapse_rlvnn55bzvd0.js"></script>
+        <script src="../js/table-of-contents_35en0xznwr03i.js"></script>
+        
+        <!-- The loading of KaTeX is deferred to speed up page rendering -->
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+
+        <!-- To automatically render math in text elements, include the auto-render extension: -->
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // ? auto-render specific keys, e.g.:
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    // ? rendering keys, e.g.:
+                    throwOnError : false
+                });
+            });
+        </script>
+        
+    </head>
+    <body>
+        <header>
+            <div class="logo">
+                <a href="..">清芷的博客</a>
+            </div>
+            <nav>
+                <a href="..">首页</a>
+                <a href="../about.html">关于</a>
+                <a href="../contact.html">联系</a>
+                <a href="../friends.html">友链</a>
+                <a href="../archive.html">归档</a>
+            </nav>
+        </header>
+
+        <main role="main">
+            <h1>BZOJ2815 [ZJOI2012] 灾难</h1>
+            <div class="info">
+    
+    2018 年 04 月 13 日发布.
+    
+</div>
+
+<h3 id="description">Description</h3>
+<p>$n$ 个点 $m$ 条边的DAG，对于每个点，求它的重要度。重要度定义如下：</p>
+<p>对于 $v$ 这个点，将其（和其相连的所有边）删去。之后考察所有点，如果某个点初始时出度不为 $0$ 而当前出度为 $0$ ，则将这个点也删去。重复这个过程直到没有点被删去。 $v$ 的重要度即为除它以外删掉的点的个数。</p>
+<p>$n\leqslant10^5$ 。</p>
+<!--more-->
+<h3 id="solution">Solution</h3>
+<p>首先我们把所有边都反向（这样比较方便处理，其实也无所谓的）。</p>
+<p>这样的话，拓扑序后面的点不会影响到前面的点。</p>
+<p>首先，我们有一个性质： $u$ 会影响到 $v$ 当且仅当所有从生产者到 $v$ 的路径上都包含 $u$ 。这是显然的。</p>
+<p>对于一个点 $v$ ，找到会影响到它的点（也就是说，那些删掉之后会导致 $v$ 消失）中除了它本身外拓扑序最靠后的一个点，假设它是 $t_v$ 。</p>
+<p>那么有一个重要的性质：会影响到 $v$ 的点只有 $v, t_v, t_{t_v}, ...$ 这些。</p>
+<p>证明：</p>
+<p>如果有某个点 $u$ 会影响到 $v$ ，它在拓扑序上必定位于某个 $t_k$ 和 $k$ 之间，其中 $k=t_{\ddots_v}$ 。</p>
+<p>既然 $t_k$ 是最后一个能影响到 $k$ 的，那么 $u$ 就不能影响到 $k$ 。那么一定存在一条从生产者到 $k$ 的路径不经过 $u$ 。但是既然 $k$ 会影响到 $v$ ，就一定存在一条 $k$ 到 $v$ 的路径。把这两条路径拼起来，就能得到一条从生产者到 $v$ 、不经过 $u$ 的路径，于是 $u$ 就不能影响到 $v$ ，矛盾。</p>
+<p>那么我们把 $t$ 当成父亲关系建出一棵树（即“灭绝树”），删掉 $v$ 之后受影响的结点个数就是 $v$ 的子树大小。所以现在只需要考虑 $t$ 怎么求。</p>
+<p>按拓扑序建树，则考虑到某个点的时候它的前驱已经考虑完了。那么它的父亲就会是它所有的前驱的 LCA （因为只有删掉公共祖先才能使这些前驱都被删掉，从而使 v 被删掉）。</p>
+<p>边建树边倍增即可。复杂度 $O(n\log n)$ 。</p>
+<h3 id="code">Code</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;algorithm&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;cstdio&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;cstring&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> <span class="dt">int</span> N <span class="op">=</span> <span class="dv">100050</span><span class="op">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> <span class="dt">int</span> M <span class="op">=</span> <span class="dv">1000050</span><span class="op">;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> pre<span class="op">[</span>N<span class="op">],</span> to<span class="op">[</span>M<span class="op">],</span> nxt<span class="op">[</span>M<span class="op">],</span> cnt<span class="op">;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> n<span class="op">,</span> m<span class="op">,</span> f<span class="op">[</span>N<span class="op">],</span> fa<span class="op">[</span>N<span class="op">][</span><span class="dv">20</span><span class="op">],</span> dep<span class="op">[</span>N<span class="op">],</span> ind<span class="op">[</span>N<span class="op">];</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> que<span class="op">[</span>N<span class="op">],</span> siz<span class="op">[</span>N<span class="op">];</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">inline</span> <span class="dt">void</span> addEdge<span class="op">(</span><span class="dt">int</span> x<span class="op">,</span> <span class="dt">int</span> y<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  nxt<span class="op">[</span>cnt<span class="op">]</span> <span class="op">=</span> pre<span class="op">[</span>x<span class="op">];</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  to<span class="op">[</span>pre<span class="op">[</span>x<span class="op">]</span> <span class="op">=</span> cnt<span class="op">++]</span> <span class="op">=</span> y<span class="op">;</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> LCA<span class="op">(</span><span class="dt">int</span> x<span class="op">,</span> <span class="dt">int</span> y<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>dep<span class="op">[</span>x<span class="op">]</span> <span class="op">&lt;</span> dep<span class="op">[</span>y<span class="op">])</span> <span class="bu">std::</span>swap<span class="op">(</span>x<span class="op">,</span> y<span class="op">);</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">19</span><span class="op">;</span> i <span class="op">&gt;=</span> <span class="dv">0</span><span class="op">;</span> <span class="op">--</span>i<span class="op">)</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>dep<span class="op">[</span>fa<span class="op">[</span>x<span class="op">][</span>i<span class="op">]]</span> <span class="op">&gt;=</span> dep<span class="op">[</span>y<span class="op">])</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>      x <span class="op">=</span> fa<span class="op">[</span>x<span class="op">][</span>i<span class="op">];</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">19</span><span class="op">;</span> i <span class="op">&gt;=</span> <span class="dv">0</span><span class="op">;</span> <span class="op">--</span>i<span class="op">)</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>fa<span class="op">[</span>x<span class="op">][</span>i<span class="op">]</span> <span class="op">!=</span> fa<span class="op">[</span>y<span class="op">][</span>i<span class="op">])</span> <span class="op">{</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>      x <span class="op">=</span> fa<span class="op">[</span>x<span class="op">][</span>i<span class="op">];</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>      y <span class="op">=</span> fa<span class="op">[</span>y<span class="op">][</span>i<span class="op">];</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> x <span class="op">==</span> y <span class="op">?</span> x <span class="op">:</span> f<span class="op">[</span>x<span class="op">];</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Build<span class="op">(</span><span class="dt">int</span> x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  dep<span class="op">[</span>x<span class="op">]</span> <span class="op">=</span> <span class="dv">1</span> <span class="op">+</span> dep<span class="op">[</span>fa<span class="op">[</span>x<span class="op">][</span><span class="dv">0</span><span class="op">]</span> <span class="op">=</span> f<span class="op">[</span>x<span class="op">]];</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> fa<span class="op">[</span>x<span class="op">][</span>i<span class="op">]</span> <span class="op">!=</span> <span class="dv">0</span><span class="op">;</span> <span class="op">++</span>i<span class="op">)</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    fa<span class="op">[</span>x<span class="op">][</span>i <span class="op">+</span> <span class="dv">1</span><span class="op">]</span> <span class="op">=</span> fa<span class="op">[</span>fa<span class="op">[</span>x<span class="op">][</span>i<span class="op">]][</span>i<span class="op">];</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  scanf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%d</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">&amp;</span>n<span class="op">);</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  memset<span class="op">(</span>pre<span class="op">,</span> <span class="op">-</span><span class="dv">1</span><span class="op">,</span> <span class="kw">sizeof</span> pre<span class="op">);</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> x <span class="op">&lt;=</span> n<span class="op">;</span> <span class="op">++</span>x<span class="op">)</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> y<span class="op">;</span> <span class="op">;</span> <span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>      scanf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%d</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">&amp;</span>y<span class="op">);</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>y <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>      addEdge<span class="op">(</span>y<span class="op">,</span> x<span class="op">);</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>      <span class="op">++</span>ind<span class="op">[</span>x<span class="op">];</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> hd <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> tl <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>  memset<span class="op">(</span>f<span class="op">,</span> <span class="op">-</span><span class="dv">1</span><span class="op">,</span> <span class="kw">sizeof</span> f<span class="op">);</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;=</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>ind<span class="op">[</span>i<span class="op">]</span> <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>      dep<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>      f<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>      que<span class="op">[</span>tl<span class="op">++]</span> <span class="op">=</span> i<span class="op">;</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> <span class="op">(</span>hd <span class="op">&lt;</span> tl<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> x <span class="op">=</span> que<span class="op">[</span>hd<span class="op">++];</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> pre<span class="op">[</span>x<span class="op">];</span> i <span class="op">!=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span> i <span class="op">=</span> nxt<span class="op">[</span>i<span class="op">])</span> <span class="op">{</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>      <span class="dt">int</span> y <span class="op">=</span> to<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>f<span class="op">[</span>y<span class="op">]</span> <span class="op">==</span> <span class="op">-</span><span class="dv">1</span><span class="op">)</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>        f<span class="op">[</span>y<span class="op">]</span> <span class="op">=</span> x<span class="op">;</span></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>      <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>f<span class="op">[</span>y<span class="op">]</span> <span class="op">!=</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>        f<span class="op">[</span>y<span class="op">]</span> <span class="op">=</span> LCA<span class="op">(</span>f<span class="op">[</span>y<span class="op">],</span> x<span class="op">);</span></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">((--</span>ind<span class="op">[</span>y<span class="op">])</span> <span class="op">==</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>        Build<span class="op">(</span>que<span class="op">[</span>tl<span class="op">++]</span> <span class="op">=</span> y<span class="op">);</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> n <span class="op">-</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&gt;=</span> <span class="dv">0</span><span class="op">;</span> <span class="op">--</span>i<span class="op">)</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>    siz<span class="op">[</span>f<span class="op">[</span>que<span class="op">[</span>i<span class="op">]]]</span> <span class="op">+=</span> <span class="op">++</span>siz<span class="op">[</span>que<span class="op">[</span>i<span class="op">]];</span></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;=</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> siz<span class="op">[</span>i<span class="op">]</span> <span class="op">-</span> <span class="dv">1</span><span class="op">);</span></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+
+        </main>
+
+        <footer>
+            ♥ 由
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+            生成！
+
+            © 遵循
+            <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
+                CC-BY 4.0
+            </a>
+            知识共享协议.
+        </footer>
+    </body>
+</html>

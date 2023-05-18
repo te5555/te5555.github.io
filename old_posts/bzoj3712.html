@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="zh-Hans-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>BZOJ3712 [PA2014] Filoki - 清芷的博客</title>
+        <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon_3f3okc0t0smnz.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32_lrgcr2u2dgnr.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16_1siqrekx8ykol.png">
+        <link rel="manifest" href="../site.webmanifest">
+        <link rel="stylesheet" href="../css/fifthave_3dfyc7189qcwg.css" />
+        <link rel="stylesheet" href="../css/syntax_lf612iqmmilx.css" />
+        <link rel="stylesheet" href="../css/banana_2lzbro8offw8.css" />
+        <link rel="stylesheet" href="../css/katex.min_1koofb1j5udh9.css" />
+        <script src="../js/jquery-3.6.1.min_1udo1bomfn0oe.js"></script>
+        <script src="../js/proof-collapse_rlvnn55bzvd0.js"></script>
+        <script src="../js/table-of-contents_35en0xznwr03i.js"></script>
+        
+        <!-- The loading of KaTeX is deferred to speed up page rendering -->
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+
+        <!-- To automatically render math in text elements, include the auto-render extension: -->
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                renderMathInElement(document.body, {
+                    // customised options
+                    // ? auto-render specific keys, e.g.:
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    // ? rendering keys, e.g.:
+                    throwOnError : false
+                });
+            });
+        </script>
+        
+    </head>
+    <body>
+        <header>
+            <div class="logo">
+                <a href="..">清芷的博客</a>
+            </div>
+            <nav>
+                <a href="..">首页</a>
+                <a href="../about.html">关于</a>
+                <a href="../contact.html">联系</a>
+                <a href="../friends.html">友链</a>
+                <a href="../archive.html">归档</a>
+            </nav>
+        </header>
+
+        <main role="main">
+            <h1>BZOJ3712 [PA2014] Filoki</h1>
+            <div class="info">
+    
+    2018 年 12 月 26 日发布.
+    
+</div>
+
+<h3 id="description">Description</h3>
+<p>有若干药瓶，第 $i$ 号药瓶里装着 $g_i$ 克 $i$ 号物质。</p>
+<p>有 $m$ 次操作，第 $i$ 次会把 $a_i$ 号瓶子全部倒入 $b_i$ 号瓶子，之后 $a_i$ 号瓶子不会再用到。</p>
+<p>一共 $k$ 对物质之间会反应生成沉淀（沉淀不再参与反应），1 克 $c_i$ 物质和 1 克 $d_i$ 物质反应生成 2 克沉淀。</p>
+<p>当有若干反应都可以进行的时候优先进行编号小的反应。求整个过程中一共生成了多少沉淀。</p>
+<p>$m&lt;n\leqslant2\times10^5,k\leqslant5\times10^5$。</p>
+<!--more-->
+<h3 id="solution">Solution</h3>
+<p>如果把 $a_i$ 瓶子倒入 $b_i$ 瓶子，那么新建一个结点作为 $a_i$ 和 $b_i$ 的父亲，将它作为新的 $b_i$ 瓶子对应的结点。</p>
+<p>这样的话相当于每个结点的物质是两个儿子的物质合起来，并进行反应。</p>
+<p>显然第 $i$ 种反应只可能会在 ${\rm LCA}(c_i,d_i)$ 处反应。</p>
+<p>我们假设所有物质最开始都是放在一起的，但是不发生反应。</p>
+<p>把这个森林按照后序遍历，遍历到某个结点的时候再让它上面的反应依次进行。</p>
+<p>复杂度 $O(m+(n+k)\log n)$。</p>
+<p>代码中因为每个点父亲编号都比它大所以直接按结点顺序从前往后进行反应即可。</p>
+<h3 id="code">Code</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;algorithm&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;cctype&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;cstdio&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;cstring&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> <span class="dt">int</span> N <span class="op">=</span> <span class="dv">400050</span><span class="op">;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> <span class="dt">int</span> M <span class="op">=</span> <span class="dv">500050</span><span class="op">;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="dt">long</span> <span class="dt">long</span> LL<span class="op">;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> n<span class="op">,</span> m<span class="op">,</span> g<span class="op">[</span>N<span class="op">],</span> lc<span class="op">[</span>N<span class="op">],</span> rc<span class="op">[</span>N<span class="op">],</span> now<span class="op">[</span>N<span class="op">];</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> dep<span class="op">[</span>N<span class="op">],</span> fa<span class="op">[</span>N<span class="op">][</span><span class="dv">20</span><span class="op">];</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> k<span class="op">,</span> c<span class="op">[</span>N<span class="op">],</span> L<span class="op">[</span>M<span class="op">],</span> a<span class="op">[</span>M<span class="op">],</span> b<span class="op">[</span>M<span class="op">],</span> T<span class="op">[</span>M<span class="op">];</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> LCA<span class="op">(</span><span class="dt">int</span> x<span class="op">,</span> <span class="dt">int</span> y<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>dep<span class="op">[</span>x<span class="op">]</span> <span class="op">&lt;</span> dep<span class="op">[</span>y<span class="op">])</span> <span class="bu">std::</span>swap<span class="op">(</span>x<span class="op">,</span> y<span class="op">);</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">19</span><span class="op">;</span> <span class="op">~</span>i<span class="op">;</span> <span class="op">--</span>i<span class="op">)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>dep<span class="op">[</span>fa<span class="op">[</span>x<span class="op">][</span>i<span class="op">]]</span> <span class="op">&gt;=</span> dep<span class="op">[</span>y<span class="op">])</span> x <span class="op">=</span> fa<span class="op">[</span>x<span class="op">][</span>i<span class="op">];</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>x <span class="op">==</span> y<span class="op">)</span> <span class="cf">return</span> x<span class="op">;</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">19</span><span class="op">;</span> <span class="op">~</span>i<span class="op">;</span> <span class="op">--</span>i<span class="op">)</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>fa<span class="op">[</span>x<span class="op">][</span>i<span class="op">]</span> <span class="op">!=</span> fa<span class="op">[</span>y<span class="op">][</span>i<span class="op">])</span> <span class="op">{</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>      x <span class="op">=</span> fa<span class="op">[</span>x<span class="op">][</span>i<span class="op">];</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>      y <span class="op">=</span> fa<span class="op">[</span>y<span class="op">][</span>i<span class="op">];</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> fa<span class="op">[</span>x<span class="op">][</span><span class="dv">0</span><span class="op">];</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  scanf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%d%d%d</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">&amp;</span>n<span class="op">,</span> <span class="op">&amp;</span>m<span class="op">,</span> <span class="op">&amp;</span>k<span class="op">);</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;=</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> scanf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%d</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">&amp;</span>g<span class="op">[</span>now<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> i<span class="op">]);</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">,</span> x<span class="op">,</span> y<span class="op">;</span> i <span class="op">&lt;=</span> m<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    scanf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%d%d</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">&amp;</span>x<span class="op">,</span> <span class="op">&amp;</span>y<span class="op">);</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    fa<span class="op">[</span>lc<span class="op">[</span>i <span class="op">+</span> n<span class="op">]</span> <span class="op">=</span> now<span class="op">[</span>x<span class="op">]][</span><span class="dv">0</span><span class="op">]</span> <span class="op">=</span> i <span class="op">+</span> n<span class="op">;</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    fa<span class="op">[</span>rc<span class="op">[</span>i <span class="op">+</span> n<span class="op">]</span> <span class="op">=</span> now<span class="op">[</span>y<span class="op">]][</span><span class="dv">0</span><span class="op">]</span> <span class="op">=</span> i <span class="op">+</span> n<span class="op">;</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    now<span class="op">[</span>y<span class="op">]</span> <span class="op">=</span> i <span class="op">+</span> n<span class="op">;</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> x <span class="op">=</span> n <span class="op">+</span> m<span class="op">;</span> x<span class="op">;</span> <span class="op">--</span>x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(!</span>fa<span class="op">[</span>x<span class="op">][</span><span class="dv">0</span><span class="op">])</span> fa<span class="op">[</span>x<span class="op">][</span><span class="dv">0</span><span class="op">]</span> <span class="op">=</span> n <span class="op">+</span> m <span class="op">+</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    dep<span class="op">[</span>x<span class="op">]</span> <span class="op">=</span> dep<span class="op">[</span>fa<span class="op">[</span>x<span class="op">][</span><span class="dv">0</span><span class="op">]]</span> <span class="op">+</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> fa<span class="op">[</span>x<span class="op">][</span>i<span class="op">];</span> <span class="op">++</span>i<span class="op">)</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>      fa<span class="op">[</span>x<span class="op">][</span>i <span class="op">+</span> <span class="dv">1</span><span class="op">]</span> <span class="op">=</span> fa<span class="op">[</span>fa<span class="op">[</span>x<span class="op">][</span>i<span class="op">]][</span>i<span class="op">];</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;=</span> k<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    scanf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%d%d</span><span class="st">&quot;</span><span class="op">,</span> <span class="op">&amp;</span>a<span class="op">[</span>i<span class="op">],</span> <span class="op">&amp;</span>b<span class="op">[</span>i<span class="op">]);</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    <span class="op">++</span>c<span class="op">[</span>L<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> LCA<span class="op">(</span>a<span class="op">[</span>i<span class="op">],</span> b<span class="op">[</span>i<span class="op">])];</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;=</span> n <span class="op">+</span> m <span class="op">+</span> <span class="dv">1</span><span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> c<span class="op">[</span>i<span class="op">]</span> <span class="op">+=</span> c<span class="op">[</span>i <span class="op">-</span> <span class="dv">1</span><span class="op">];</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> k<span class="op">;</span> i<span class="op">;</span> <span class="op">--</span>i<span class="op">)</span> T<span class="op">[</span>c<span class="op">[</span>L<span class="op">[</span>i<span class="op">]]--]</span> <span class="op">=</span> i<span class="op">;</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>  LL ans <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;=</span> k <span class="op">&amp;&amp;</span> L<span class="op">[</span>T<span class="op">[</span>i<span class="op">]]</span> <span class="op">&lt;=</span> n <span class="op">+</span> m<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> x <span class="op">=</span> T<span class="op">[</span>i<span class="op">],</span> t <span class="op">=</span> <span class="bu">std::</span>min<span class="op">(</span>g<span class="op">[</span>a<span class="op">[</span>x<span class="op">]],</span> g<span class="op">[</span>b<span class="op">[</span>x<span class="op">]]);</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    ans <span class="op">+=</span> <span class="dv">2</span> <span class="op">*</span> t<span class="op">;</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    g<span class="op">[</span>a<span class="op">[</span>x<span class="op">]]</span> <span class="op">-=</span> t<span class="op">;</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    g<span class="op">[</span>b<span class="op">[</span>x<span class="op">]]</span> <span class="op">-=</span> t<span class="op">;</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>  printf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%lld\n</span><span class="st">&quot;</span><span class="op">,</span> ans<span class="op">);</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+
+        </main>
+
+        <footer>
+            ♥ 由
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+            生成！
+
+            © 遵循
+            <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
+                CC-BY 4.0
+            </a>
+            知识共享协议.
+        </footer>
+    </body>
+</html>
