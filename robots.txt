@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: www.zhihaoliang.com/al-folio/sitemap.xml
+Sitemap: www.zhihaoliang.com/sitemap.xml
