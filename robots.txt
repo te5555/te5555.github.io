@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: www.zhihaoliang.com/sitemap.xml
+Sitemap: https://te5555.github.io/sitemap.xml
