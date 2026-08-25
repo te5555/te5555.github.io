@@ -7,4 +7,4 @@ nav: true
 nav_order: 3
 ---
 
-Details about my academic and professional services will be added here.
+Academic and professional service activities will be listed here.
